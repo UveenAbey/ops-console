@@ -95,6 +95,28 @@ app.use((req, res, next) => {
   next();
 });
 
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({
+    name: 'xSPECTRE Ops Console API',
+    version: '1.0.0',
+    status: 'online',
+    endpoints: {
+      health: '/health',
+      enroll: '/api/enroll',
+      devices: '/api/devices',
+      heartbeat: '/api/heartbeat/:device_id',
+      commands: '/api/commands',
+      alerts: '/api/alerts',
+      backups: '/api/backups',
+      users: '/api/users',
+      auth: '/api/auth',
+      websocket: '/ws'
+    },
+    docs: 'https://github.com/UveenAbey/ops-console'
+  });
+});
+
 // Health check endpoint
 app.get('/health', async (req, res) => {
   try {
@@ -126,10 +148,31 @@ app.use('/api/alerts', alertRoutes);
 app.use('/api/backups', backupRoutes);
 app.use('/api/users', userRoutes);
 
+// Serve static frontend files
+const path = require('path');
+const frontendPath = path.join(__dirname, '../web/dist');
+app.use(express.static(frontendPath));
+
 // Static files (for bootstrap script, agent download, etc.)
 app.use('/downloads', express.static('public'));
 
-// 404 handler
+// Serve index.html for all non-API routes (SPA fallback)
+app.get('*', (req, res, next) => {
+  // Skip API routes
+  if (req.path.startsWith('/api') || req.path === '/health' || req.path === '/ws') {
+    return next();
+  }
+  
+  // Serve index.html for frontend routes
+  const indexPath = path.join(frontendPath, 'index.html');
+  if (require('fs').existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    next();
+  }
+});
+
+// 404 handler for API routes
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
@@ -148,10 +191,10 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start background jobs
-const { startAlertEvaluator } = require('./jobs/alert-evaluator');
-const { startBackupScheduler } = require('./jobs/backup-scheduler');
-const { startDeviceMonitor } = require('./jobs/device-monitor');
+// Import background jobs
+const alertEvaluator = require('./jobs/alert-evaluator');
+const backupScheduler = require('./jobs/backup-scheduler');
+const deviceMonitor = require('./jobs/device-monitor');
 
 // Graceful shutdown
 const shutdown = async () => {
@@ -186,9 +229,9 @@ server.listen(PORT, () => {
   logger.info(`WebSocket endpoint: ws://localhost:${PORT}/ws`);
   
   // Start background jobs
-  startAlertEvaluator();
-  startBackupScheduler();
-  startDeviceMonitor();
+  alertEvaluator.start();
+  backupScheduler.start();
+  deviceMonitor.start();
 });
 
 module.exports = { app, server, wss };
