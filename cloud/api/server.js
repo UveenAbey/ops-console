@@ -9,6 +9,8 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const { createServer } = require('http');
 const WebSocket = require('ws');
+const path = require('path');
+const fs = require('fs');
 const logger = require('./utils/logger');
 const db = require('./utils/database');
 
@@ -21,6 +23,11 @@ const alertRoutes = require('./routes/alerts');
 const backupRoutes = require('./routes/backups');
 const userRoutes = require('./routes/users');
 const authRoutes = require('./routes/auth');
+
+// Import background jobs
+const alertEvaluator = require('./jobs/alert-evaluator');
+const backupScheduler = require('./jobs/backup-scheduler');
+const deviceMonitor = require('./jobs/device-monitor');
 
 // Initialize Express
 const app = express();
@@ -58,7 +65,12 @@ global.broadcastUpdate = (type, data) => {
 };
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: false,
+  crossOriginResourcePolicy: false
+}));
 app.use(cors({
   origin: process.env.CORS_ORIGIN || '*',
   credentials: true
@@ -95,28 +107,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Root endpoint
-app.get('/', (req, res) => {
-  res.json({
-    name: 'xSPECTRE Ops Console API',
-    version: '1.0.0',
-    status: 'online',
-    endpoints: {
-      health: '/health',
-      enroll: '/api/enroll',
-      devices: '/api/devices',
-      heartbeat: '/api/heartbeat/:device_id',
-      commands: '/api/commands',
-      alerts: '/api/alerts',
-      backups: '/api/backups',
-      users: '/api/users',
-      auth: '/api/auth',
-      websocket: '/ws'
-    },
-    docs: 'https://github.com/UveenAbey/ops-console'
-  });
-});
-
 // Health check endpoint
 app.get('/health', async (req, res) => {
   try {
@@ -148,33 +138,50 @@ app.use('/api/alerts', alertRoutes);
 app.use('/api/backups', backupRoutes);
 app.use('/api/users', userRoutes);
 
-// Serve static frontend files
-const path = require('path');
-const frontendPath = path.join(__dirname, '../web/dist');
-app.use(express.static(frontendPath));
-
 // Static files (for bootstrap script, agent download, etc.)
 app.use('/downloads', express.static('public'));
 
-// Serve index.html for all non-API routes (SPA fallback)
+// Serve static frontend files
+const frontendPath = path.join(__dirname, '../web/dist');
+const indexPath = path.join(frontendPath, 'index.html');
+app.use(express.static(frontendPath));
+
+// SPA fallback - serve index.html for all non-API routes
 app.get('*', (req, res, next) => {
-  // Skip API routes
-  if (req.path.startsWith('/api') || req.path === '/health' || req.path === '/ws') {
+  // Skip API routes and health endpoint
+  if (req.path.startsWith('/api') || req.path === '/health' || req.path === '/ws' || req.path === '/downloads') {
     return next();
   }
   
   // Serve index.html for frontend routes
-  const indexPath = path.join(frontendPath, 'index.html');
-  if (require('fs').existsSync(indexPath)) {
+  if (fs.existsSync(indexPath)) {
     res.sendFile(indexPath);
   } else {
-    next();
+    // If frontend not built, show API info
+    res.json({
+      name: 'xSPECTRE Ops Console API',
+      version: '1.0.0',
+      status: 'online',
+      message: 'Frontend not built. Run: cd /opt/xspectre/cloud/web && npm install && npm run build',
+      endpoints: {
+        health: '/health',
+        enroll: '/api/enroll',
+        devices: '/api/devices',
+        heartbeat: '/api/heartbeat/:device_id',
+        commands: '/api/commands',
+        alerts: '/api/alerts',
+        backups: '/api/backups',
+        users: '/api/users',
+        auth: '/api/auth',
+        websocket: '/ws'
+      }
+    });
   }
 });
 
-// 404 handler for API routes
-app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+// 404 handler for API routes only
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ error: 'API route not found' });
 });
 
 // Error handler
@@ -190,11 +197,6 @@ app.use((err, req, res, next) => {
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
 });
-
-// Import background jobs
-const alertEvaluator = require('./jobs/alert-evaluator');
-const backupScheduler = require('./jobs/backup-scheduler');
-const deviceMonitor = require('./jobs/device-monitor');
 
 // Graceful shutdown
 const shutdown = async () => {
