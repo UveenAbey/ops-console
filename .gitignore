@@ -1,0 +1,149 @@
+# Git Ignore for xSPECTRE Ops Console
+
+# ======================
+# Environment & Secrets
+# ======================
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+*.p12
+*.pfx
+
+# ======================
+# Node.js
+# ======================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# ======================
+# Logs
+# ======================
+logs/
+*.log
+combined.log
+error.log
+exceptions.log
+rejections.log
+
+# ======================
+# Database
+# ======================
+*.sqlite
+*.sqlite3
+*.db
+backups/*.sql
+backups/*.sql.gz
+
+# ======================
+# OS Files
+# ======================
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# ======================
+# IDEs
+# ======================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# ======================
+# Build Output
+# ======================
+dist/
+build/
+out/
+.next/
+.nuxt/
+*.tsbuildinfo
+
+# ======================
+# Testing
+# ======================
+coverage/
+.nyc_output/
+*.lcov
+
+# ======================
+# Temporary Files
+# ======================
+tmp/
+temp/
+*.tmp
+
+# ======================
+# Backup Files
+# ======================
+*.bak
+*.backup
+*.old
+
+# ======================
+# Package Files
+# ======================
+*.tar
+*.tar.gz
+*.zip
+*.rar
+
+# ======================
+# WireGuard Keys (NEVER COMMIT!)
+# ======================
+*.key
+*.pub
+wg*.conf
+
+# ======================
+# Recovery USB Build
+# ======================
+recovery-usb/build/
+recovery-usb/*.iso
+recovery-usb/*.img
+
+# ======================
+# Agent Binaries
+# ======================
+agent/xspectre-agent
+agent/xspectre-agent.exe
+agent/dist/
+
+# ======================
+# macOS
+# ======================
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# ======================
+# Windows
+# ======================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ======================
+# Linux
+# ======================
+*~
+.directory
+.Trash-*
+
+# ======================
+# Keep Important Files
+# ======================
+!.gitkeep
+!.env.example
