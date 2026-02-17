@@ -13,19 +13,24 @@ const Login = ({ onLogin }) => {
     setLoading(true)
 
     try {
-      // TODO: Replace with actual API call when auth endpoint is implemented
-      // const response = await fetch('/api/auth/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email, password })
-      // })
-      
-      // For now, use demo credentials
-      if (email === 'admin@xspectre.internal' && password === 'Admin123!') {
-        const demoToken = 'demo-token-' + Date.now()
-        onLogin(demoToken)
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+        setError(data.error || 'Invalid credentials')
+        return
+      }
+
+      const data = await response.json()
+
+      if (data.token) {
+        onLogin(data.token)
       } else {
-        setError('Invalid credentials. Use: admin@xspectre.internal / Admin123!')
+        setError('Login response did not include a token')
       }
     } catch (err) {
       setError('Login failed. Please try again.')
@@ -87,12 +92,7 @@ const Login = ({ onLogin }) => {
           </button>
         </form>
 
-        <div className="login-footer">
-          <p className="demo-creds">
-            <strong>Demo credentials:</strong><br />
-            admin@xspectre.internal / Admin123!
-          </p>
-        </div>
+        <div className="login-footer" />
       </div>
     </div>
   )

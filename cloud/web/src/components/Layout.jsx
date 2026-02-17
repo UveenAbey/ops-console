@@ -77,7 +77,24 @@ const Layout = ({ children, onLogout }) => {
             <span className="nav-icon">🔔</span>
             <span className="nav-text">Alerts</span>
           </Link>
-        </nav>
+
+          <Link 
+            to="/downloads" 
+            className={`nav-item ${isActive('/downloads') ? 'active' : ''}`}
+          >
+            <span className="nav-icon">📥</span>
+            <span className="nav-text">Downloads</span>
+          </Link>
+
+          <div style={{height: '1px', background: '#e5e7eb', margin: '8px 0'}}></div>
+
+          <Link 
+            to="/settings" 
+            className={`nav-item ${isActive('/settings') ? 'active' : ''}`}
+          >
+            <span className="nav-icon">⚙️</span>
+            <span className="nav-text">Settings</span>
+          </Link>
 
         <div className="sidebar-footer">
           <div className="ws-status">
@@ -96,6 +113,8 @@ const Layout = ({ children, onLogout }) => {
               {location.pathname === '/' && 'Dashboard'}
               {location.pathname === '/devices' && 'Devices'}
               {location.pathname === '/alerts' && 'Alerts'}
+              {location.pathname === '/downloads' && 'Downloads'}
+              {location.pathname === '/settings' && 'Settings'}
             </h1>
           </div>
           <div className="header-right">

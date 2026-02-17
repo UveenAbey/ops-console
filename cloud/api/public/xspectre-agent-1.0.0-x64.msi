@@ -1,0 +1,22 @@
+# xSPECTRE Agent Installation Guide
+
+This is the Windows x64 installer package for xSPECTRE Agent v1.0.0
+
+## Installation Instructions
+
+1. Extract or run this installer with Administrator privileges
+2. Follow the installation wizard
+3. When prompted, enter your enrollment key from the xSPECTRE Ops Console
+4. The agent will automatically start and connect to your console
+
+## System Requirements
+- Windows 7 or later
+- .NET Framework 4.5+
+- Administrator privileges for installation
+- Network connectivity to the console server
+
+## Support
+For issues or questions, visit: https://docs.xspectre.io/agent/windows
+
+---
+This is a mock installer. In production, this would be the actual Windows MSI package.

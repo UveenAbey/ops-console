@@ -4,6 +4,8 @@ import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import Devices from './pages/Devices'
 import Alerts from './pages/Alerts'
+import Downloads from './pages/Downloads'
+import Settings from './pages/Settings'
 import Login from './pages/Login'
 import './App.css'
 
@@ -63,6 +65,8 @@ function App() {
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/devices" element={<Devices />} />
                   <Route path="/alerts" element={<Alerts />} />
+                  <Route path="/downloads" element={<Downloads />} />
+                  <Route path="/settings" element={<Settings />} />
                 </Routes>
               </Layout>
             ) : (

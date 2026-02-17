@@ -1,0 +1,20 @@
+#!/bin/bash
+# xSPECTRE Agent Binary (Mock)
+# This is a placeholder for the actual compiled agent
+
+echo "xSPECTRE Agent v1.0.0"
+echo "Starting agent service..."
+
+# Load configuration
+if [ -f /var/lib/xspectre-agent/config.conf ]; then
+  source /var/lib/xspectre-agent/config.conf
+  echo "Enrollment Key: ${ENROLLMENT_KEY:0:20}..."
+  echo "Console URL: $CONSOLE_URL"
+fi
+
+# Keep the service running
+while true; do
+  # Log heartbeat every 60 seconds
+  echo "[$(date)] Agent heartbeat - connected to $CONSOLE_URL" >> /var/log/xspectre-agent/agent.log
+  sleep 60
+done

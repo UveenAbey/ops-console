@@ -1,0 +1,33 @@
+# xSPECTRE Agent Installation Guide - macOS
+# Version: 1.0.0
+
+This is the macOS installer package for xSPECTRE Agent v1.0.0
+
+## Installation Instructions
+
+1. Double-click the xspectre-agent-1.0.0.dmg file to mount the disk image
+
+2. Follow the installation wizard steps:
+   - Review the license agreement
+   - Select installation destination (usually Macintosh HD)
+   - Enter your administrator password when prompted
+
+3. Launch the xSPECTRE Agent:
+   - Open Applications > Utilities > xSPECTRE Agent
+   - Or use Spotlight search to find "xSPECTRE Agent"
+
+4. In the agent settings, enter your enrollment key from the xSPECTRE Ops Console
+
+5. The agent will appear in your menu bar and automatically connect to the console
+
+## System Requirements
+- macOS 10.12 (Sierra) or later
+- Intel or Apple Silicon processor
+- Administrator privileges for installation
+- Network connectivity to the console server
+
+## Support
+For issues or questions, visit: https://docs.xspectre.io/agent/macos
+
+---
+This is a mock installer. In production, this would be the actual macOS DMG package.

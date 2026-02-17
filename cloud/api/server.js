@@ -23,6 +23,7 @@ const alertRoutes = require('./routes/alerts');
 const backupRoutes = require('./routes/backups');
 const userRoutes = require('./routes/users');
 const authRoutes = require('./routes/auth');
+const authenticate = require('./middleware/auth');
 
 // Import background jobs
 const alertEvaluator = require('./jobs/alert-evaluator');
@@ -33,6 +34,9 @@ const deviceMonitor = require('./jobs/device-monitor');
 const app = express();
 const server = createServer(app);
 const PORT = process.env.PORT || 3000;
+
+// In-memory device registry (tracks heartbeats from agents)
+global.deviceRegistry = new Map(); // Maps enrollment_key -> { id, heartbeat_data, last_seen }
 
 // WebSocket for real-time updates
 const wss = new WebSocket.Server({ server, path: '/ws' });
@@ -78,8 +82,8 @@ app.use(cors({
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 1000, // Limit each IP to 1000 requests per minute
   message: 'Too many requests from this IP, please try again later.'
 });
 
@@ -131,12 +135,12 @@ app.get('/health', async (req, res) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/enroll', enrollRoutes);
-app.use('/api/devices', deviceRoutes);
+app.use('/api/devices', authenticate, deviceRoutes);
 app.use('/api/heartbeat', heartbeatRoutes);
-app.use('/api/commands', commandRoutes);
-app.use('/api/alerts', alertRoutes);
-app.use('/api/backups', backupRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api/commands', authenticate, commandRoutes);
+app.use('/api/alerts', authenticate, alertRoutes);
+app.use('/api/backups', authenticate, backupRoutes);
+app.use('/api/users', authenticate, userRoutes);
 
 // Static files (for bootstrap script, agent download, etc.)
 app.use('/downloads', express.static('public'));

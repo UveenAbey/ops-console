@@ -1,0 +1,29 @@
+xSPECTRE Agent v1.0.0
+=====================
+
+This is the xSPECTRE Agent for Linux systems.
+
+Installation
+============
+1. Extract: tar -xzf xspectre-agent-1.0.0-x64.tar.gz
+2. Install: cd xspectre-agent-1.0.0 && sudo ./install.sh
+3. Follow the prompts to enter your enrollment key
+
+System Requirements
+===================
+- Linux kernel 2.6+
+- glibc 2.12+
+- Root/sudo access
+- Network access to console server
+
+Supported Distributions
+=======================
+- Ubuntu 16.04+
+- Debian 8+
+- CentOS 7+
+- RHEL 7+
+- Fedora 25+
+
+License
+=======
+Copyright (c) 2026 xSPECTRE. All rights reserved.
